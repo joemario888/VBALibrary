@@ -1,0 +1,84 @@
+Option Explicit
+Function rangeBlock(rng As Range, rowLength As Long, colLength As Long) As Range
+    Dim nRow As Long
+    Dim nCol As Long
+
+    If rowLength = 0 Then
+        If rng.Offset(1, 0).Formula = "" Then
+            nRow = 0
+        Else
+            nRow = rng.End(xlDown).Row - rng.Row
+        End If
+    Else
+        nRow = rowLength - 1
+    End If
+
+    If colLength = 0 Then
+        If rng.Offset(0, 1).Formula = "" Then
+            nCol = 0
+        Else
+            nCol = rng.End(xlToRight).Column - rng.Column
+        End If
+    Else
+        nCol = colLength - 1
+    End If
+    Set rangeBlock = Range(rng, rng.Offset(nRow, nCol))
+End Function
+
+Function getConn(serverName As String, dbname As String) As ADODB.Connection
+    Dim conn As ADODB.Connection, connString As String
+    
+    Set conn = New ADODB.Connection
+    With conn
+        .Provider = "SQLOLEDB"
+        .Properties("Initial Catalog") = dbname
+        .Properties("Data Source") = serverName
+        .Properties("Integrated Security") = "SSPI"
+        .CommandTimeout = 600
+        .ConnectionTimeout = 30
+        .Open ConnectionString:=connString
+    End With
+    Set getConn = conn
+End Function
+Function getData(conn As ADODB.Connection, sql As String) As Variant
+    Dim rs As ADODB.Recordset, values As Variant
+
+    Set rs = New ADODB.Recordset
+    With rs
+        .ActiveConnection = conn
+        .Open Source:=sql, CursorType:=adOpenForwardOnly, LockType:=adLockReadOnly
+    End With
+    
+    If Not rs.EOF Then
+        values = rs.GetRows
+        getData = TransposeArray(values)
+    End If
+End Function
+Function TransposeArray(InputArr As Variant) As Variant
+
+    Dim RowNdx, ColNdx, LB1, LB2, UB1, UB2 As Long, tmpArray As Variant
+    
+    LB1 = LBound(InputArr, 1)
+    LB2 = LBound(InputArr, 2)
+    UB1 = UBound(InputArr, 1)
+    UB2 = UBound(InputArr, 2)
+    
+    ReDim tmpArray(LB2 To LB2 + UB2 - LB2, LB1 To LB1 + UB1 - LB1)
+    
+    For RowNdx = LB2 To UB2
+        For ColNdx = LB1 To UB1
+            tmpArray(RowNdx, ColNdx) = InputArr(ColNdx, RowNdx)
+        Next ColNdx
+    Next RowNdx
+    
+    TransposeArray = tmpArray
+
+End Function
+
+Function arrayCols(inputArray As Variant) As Long
+    arrayCols = UBound(inputArray, 2) - LBound(inputArray, 2) + 1
+End Function
+
+Function arrayRows(inputArray As Variant) As Long
+    arrayRows = UBound(inputArray) - LBound(inputArray) + 1
+End Function

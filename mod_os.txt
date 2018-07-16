@@ -1,0 +1,32 @@
+Function fileExist(fileName)
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    If (objFSO.FileExists(fileName)) Then
+       fileExist = True
+    Else
+       fileExist = False
+    End If
+End Function
+
+Dim PreviousCalculationSetting As Variant
+Sub StartEnviroment()
+    With Application
+        .ScreenUpdating = False
+        .EnableEvents = False
+        .DisplayAlerts = False
+        .CalculationInterruptKey = xlEscKey
+        PreviousCalculationSetting = .Calculation
+        .Calculation = xlCalculationManual
+        .Calculate
+    End With
+End Sub
+Sub EndEnviroment()
+    With Application
+        .ScreenUpdating = True
+        .EnableEvents = True
+        .DisplayAlerts = False
+        .CalculationInterruptKey = xlAnyKey
+        .Calculation = PreviousCalculationSetting
+        .Calculate
+    End With
+End Sub
+
