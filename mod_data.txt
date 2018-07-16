@@ -25,6 +25,31 @@ Function rangeBlock(rng As Range, rowLength As Long, colLength As Long) As Range
     Set rangeBlock = Range(rng, rng.Offset(nRow, nCol))
 End Function
 
+Sub fillMissing(sht As Worksheet, colOffset As Long, cellStart As Range)
+    Dim rng As Range
+    With sht
+        colCount = rangeblock(cellStart, 1, 0).Count - colOffset
+        rowCount = rangeblock(cellStart, 0, 1).Count
+            
+        With cellStart
+            For i = 1 To colCount
+                If .Offset(0, i) = "Total" Then
+                    Exit For
+                Else
+                    With .Offset(rowCount, i)
+                        If rowCount > (.End(xlUp).Row - cellStart.Row + 1) Then
+                            Set rng = rangeblock(.End(xlUp).Offset(1, 0), rowCount - .End(xlUp).Row + cellStart.Row - 1, 1)
+                            rng.Value = .End(xlUp).Value
+                            rng.Font.Color = -16776961
+                        End If
+                    End With
+                End If
+            Next i
+        End With
+            
+    End With
+
+
 Function getConn(serverName As String, dbname As String) As ADODB.Connection
     Dim conn As ADODB.Connection, connString As String
     
