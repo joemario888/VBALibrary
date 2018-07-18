@@ -79,31 +79,3 @@ Function getData(conn As ADODB.Connection, sql As String) As Variant
         getData = TransposeArray(values)
     End If
 End Function
-Function TransposeArray(InputArr As Variant) As Variant
-
-    Dim RowNdx, ColNdx, LB1, LB2, UB1, UB2 As Long, tmpArray As Variant
-    
-    LB1 = LBound(InputArr, 1)
-    LB2 = LBound(InputArr, 2)
-    UB1 = UBound(InputArr, 1)
-    UB2 = UBound(InputArr, 2)
-    
-    ReDim tmpArray(LB2 To LB2 + UB2 - LB2, LB1 To LB1 + UB1 - LB1)
-    
-    For RowNdx = LB2 To UB2
-        For ColNdx = LB1 To UB1
-            tmpArray(RowNdx, ColNdx) = InputArr(ColNdx, RowNdx)
-        Next ColNdx
-    Next RowNdx
-    
-    TransposeArray = tmpArray
-
-End Function
-
-Function arrayCols(inputArray As Variant) As Long
-    arrayCols = UBound(inputArray, 2) - LBound(inputArray, 2) + 1
-End Function
-
-Function arrayRows(inputArray As Variant) As Long
-    arrayRows = UBound(inputArray) - LBound(inputArray) + 1
-End Function
